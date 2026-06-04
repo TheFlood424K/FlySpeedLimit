@@ -1,7 +1,7 @@
 name: FlySpeedLimit
 version: ${project.version}
 main: net.medievalnetwork.flyspeedlimit.FlySpeedLimit
-api-version: '26'
+api-version: '26.1.2'
 description: Caps fly/walk speed with per-player permission overrides.
 author: TheFlood424K
 softdepend: [Essentials]
