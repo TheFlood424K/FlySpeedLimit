@@ -35,59 +35,59 @@ permissions:
     default: op
   flyspeedlimit.bypass:
     description: Bypass all speed caps.
-    default: false
+    default: op
   flyspeedlimit.speed:
     description: Use both /speed fly and /speed walk.
-    default: false
+    default: op
     children:
       flyspeedlimit.speed.fly: true
       flyspeedlimit.speed.walk: true
   flyspeedlimit.speed.fly:
     description: Use /flyspeed and /speed fly.
-    default: false
+    default: op
   flyspeedlimit.speed.walk:
     description: Use /walkspeed and /speed walk.
-    default: false
+    default: op
   flyspeedlimit.speed.others:
     description: Change another player's speed.
     default: op
   flyspeedlimit.maxfly.1:
-    default: false
+    default: op
   flyspeedlimit.maxfly.2:
-    default: false
+    default: op
   flyspeedlimit.maxfly.3:
-    default: false
+    default: op
   flyspeedlimit.maxfly.4:
-    default: false
+    default: op
   flyspeedlimit.maxfly.5:
-    default: false
+    default: op
   flyspeedlimit.maxfly.6:
-    default: false
+    default: op
   flyspeedlimit.maxfly.7:
-    default: false
+    default: op
   flyspeedlimit.maxfly.8:
-    default: false
+    default: op
   flyspeedlimit.maxfly.9:
-    default: false
+    default: op
   flyspeedlimit.maxfly.10:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.1:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.2:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.3:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.4:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.5:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.6:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.7:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.8:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.9:
-    default: false
+    default: op
   flyspeedlimit.maxwalk.10:
-    default: false
+    default: op
