@@ -1,7 +1,7 @@
 name: FlySpeedLimit
 version: ${project.version}
 main: net.medievalnetwork.flyspeedlimit.FlySpeedLimit
-api-version: '1.21'
+api-version: '26'
 description: Overrides EssentialsX speed commands and caps fly speed to a configurable maximum.
 author: TheFlood424K
 softdepend: [Essentials]
@@ -55,8 +55,6 @@ permissions:
     default: op
 
   # ── Per-permission max speed overrides ────────────────────────────────────
-  # Grant flyspeedlimit.maxfly.<0-10> to override the config max fly speed.
-  # The plugin picks the highest value the player has. Falls back to config.
   flyspeedlimit.maxfly.1:
     description: Override max fly speed to 1.
     default: false
@@ -88,7 +86,6 @@ permissions:
     description: Override max fly speed to 10 (no cap).
     default: false
 
-  # Grant flyspeedlimit.maxwalk.<0-10> to override the config max walk speed.
   flyspeedlimit.maxwalk.1:
     description: Override max walk speed to 1.
     default: false

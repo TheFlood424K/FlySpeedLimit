@@ -17,11 +17,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: maven
 
       - name: Build with Maven
@@ -29,7 +29,6 @@ jobs:
 
       - name: Rename JAR for upload
         run: |
-          # Strip the "-shaded" suffix the shade plugin adds
           cd target
           ORIGINAL=$(ls FlySpeedLimit-*-shaded.jar 2>/dev/null | head -n1)
           if [ -n "$ORIGINAL" ]; then
@@ -59,11 +58,11 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
+      - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
           cache: maven
 
       - name: Build with Maven
