@@ -1,0 +1,22 @@
+# FlySpeedLimit Configuration
+# --------------------------------
+# max-fly-speed: The maximum fly speed players are allowed to set.
+#   This maps to the value used with /speed fly <value> (EssentialsX scale: 0.0 - 10.0).
+#   Internally Minecraft stores fly speed as 0.0 - 1.0, so this plugin
+#   converts using the same formula EssentialsX uses (value / 10).
+#   Examples:
+#     2  -> allows up to /speed fly 2  (2x normal speed)
+#     5  -> allows up to /speed fly 5  (5x normal speed)
+#     10 -> no real limit (Minecraft hard cap)
+
+max-fly-speed: 2
+
+# enforce-on-join: If true, a player's fly speed will be clamped to the
+#   max when they log in (in case someone set it higher before the plugin
+#   was installed, or while they had the bypass permission).
+enforce-on-join: true
+
+# messages:
+messages:
+  speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
+  reload-success: "&aFlySpeedLimit config reloaded."
