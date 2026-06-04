@@ -12,10 +12,13 @@ public class FlySpeedListener implements Listener {
 
     private final FlySpeedLimit plugin;
     private final BlockPlaceRateLimiter rateLimiter;
+    private final SpeedCommand speedCommand;
 
-    public FlySpeedListener(FlySpeedLimit plugin, BlockPlaceRateLimiter rateLimiter) {
+    public FlySpeedListener(FlySpeedLimit plugin, BlockPlaceRateLimiter rateLimiter,
+                             SpeedCommand speedCommand) {
         this.plugin = plugin;
         this.rateLimiter = rateLimiter;
+        this.speedCommand = speedCommand;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -37,11 +40,12 @@ public class FlySpeedListener implements Listener {
     }
 
     private void clampFly(Player player, boolean notify) {
-        if (player.hasPermission("flyspeedlimit.bypass")) return;
-        float max = plugin.cfg().toNative(plugin.cfg().getMaxFlySpeed());
+        // Use the same cap resolution as SpeedCommand so permission overrides are respected
+        float max = plugin.cfg().toNative(speedCommand.effectiveCap(player, "fly"));
         if (player.getFlySpeed() > max) {
             player.setFlySpeed(max);
-            if (notify) player.sendMessage(plugin.cfg().speedClampedMsg(plugin.cfg().getMaxFlySpeed()));
+            if (notify) player.sendMessage(
+                    plugin.cfg().speedClampedMsg(speedCommand.effectiveCap(player, "fly")));
         }
     }
 }

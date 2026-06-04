@@ -4,22 +4,24 @@
 # Internally Minecraft stores speed as 0.0-1.0; this plugin converts using
 # the same formula EssentialsX uses: nativeSpeed = value / 10
 
-# Maximum fly speed players can set with /speed fly
-# e.g. 2 allows /speed fly 1 and /speed fly 2, but blocks /speed fly 3+
+# Default maximum fly speed (EssentialsX 0-10 scale).
+# This is the fallback used when a player has no flyspeedlimit.maxfly.<n> permission.
+# Players with flyspeedlimit.maxfly.<n> use the highest n they have instead.
+# Players with flyspeedlimit.bypass ignore this entirely.
 max-fly-speed: 2
 
-# Maximum walk speed players can set with /speed walk
-# Set to 10 for no practical limit
+# Default maximum walk speed (EssentialsX 0-10 scale).
+# Overridable per-player via flyspeedlimit.maxwalk.<n>.
+# Set to 10 for no practical default limit.
 max-walk-speed: 10
 
-# If true, a player's fly speed is clamped to max-fly-speed on login
+# If true, a player's fly speed is clamped to their effective max on login.
 enforce-on-join: true
 
-# Block-placement rate limiter
+# Block-placement rate limiter.
 # Prevents players from gaining a fastplace advantage from high fly speed.
-# When a player is actively flying, their block placement rate is scaled
-# proportionally so faster fliers cannot place blocks faster than baseline.
-# Set to false to disable this feature entirely.
+# Scales the block placement cooldown proportionally to fly speed so that
+# faster fliers place at the same blocks-per-second rate as baseline.
 block-place-rate-limit: true
 
 messages:
@@ -27,7 +29,9 @@ messages:
   reload-success: "&aFlySpeedLimit config reloaded."
   no-permission: "&cYou do not have permission to do that."
   invalid-number: "&cSpeed must be a number between 0 and 10."
-  invalid-type: "&cUsage: /speed <walk|fly> <0-10> [player]"
+  usage-speed: "&eUsage: /speed <walk|fly> <0-10> [player]"
+  usage-flyspeed: "&eUsage: /flyspeed <0-10> [player]"
+  usage-walkspeed: "&eUsage: /walkspeed <0-10> [player]"
   player-not-found: "&cPlayer not found."
   walk-set-self: "&aWalk speed set to &e{speed}&a."
   fly-set-self: "&aFly speed set to &e{speed}&a."

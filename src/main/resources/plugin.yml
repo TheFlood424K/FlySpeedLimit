@@ -18,15 +18,104 @@ commands:
     permission: flyspeedlimit.admin
 
 permissions:
+
+  # ── Admin ──────────────────────────────────────────────────────────────────
   flyspeedlimit.admin:
     description: Allows reloading the FlySpeedLimit config.
     default: op
+
+  # ── Bypass ─────────────────────────────────────────────────────────────────
   flyspeedlimit.bypass:
-    description: Bypasses the fly and walk speed limits.
+    description: Bypass all speed caps and the block-place rate limiter.
     default: false
+
+  # ── Command permissions ────────────────────────────────────────────────────
   flyspeedlimit.speed:
-    description: Allows use of /speed.
-    default: true
+    description: >-
+      Grants access to both /speed fly and /speed walk (and their aliases).
+      Acts as a parent: having this permission implies flyspeedlimit.speed.fly
+      and flyspeedlimit.speed.walk.
+    default: false
+    children:
+      flyspeedlimit.speed.fly: true
+      flyspeedlimit.speed.walk: true
+
+  flyspeedlimit.speed.fly:
+    description: >-
+      Allows use of /flyspeed, /fspeed, and /speed fly.
+    default: false
+
+  flyspeedlimit.speed.walk:
+    description: >-
+      Allows use of /walkspeed, /wspeed, and /speed walk.
+    default: false
+
   flyspeedlimit.speed.others:
     description: Allows changing another player's speed.
     default: op
+
+  # ── Per-permission max speed overrides ────────────────────────────────────
+  # Grant flyspeedlimit.maxfly.<0-10> to override the config max fly speed.
+  # The plugin picks the highest value the player has. Falls back to config.
+  flyspeedlimit.maxfly.1:
+    description: Override max fly speed to 1.
+    default: false
+  flyspeedlimit.maxfly.2:
+    description: Override max fly speed to 2.
+    default: false
+  flyspeedlimit.maxfly.3:
+    description: Override max fly speed to 3.
+    default: false
+  flyspeedlimit.maxfly.4:
+    description: Override max fly speed to 4.
+    default: false
+  flyspeedlimit.maxfly.5:
+    description: Override max fly speed to 5.
+    default: false
+  flyspeedlimit.maxfly.6:
+    description: Override max fly speed to 6.
+    default: false
+  flyspeedlimit.maxfly.7:
+    description: Override max fly speed to 7.
+    default: false
+  flyspeedlimit.maxfly.8:
+    description: Override max fly speed to 8.
+    default: false
+  flyspeedlimit.maxfly.9:
+    description: Override max fly speed to 9.
+    default: false
+  flyspeedlimit.maxfly.10:
+    description: Override max fly speed to 10 (no cap).
+    default: false
+
+  # Grant flyspeedlimit.maxwalk.<0-10> to override the config max walk speed.
+  flyspeedlimit.maxwalk.1:
+    description: Override max walk speed to 1.
+    default: false
+  flyspeedlimit.maxwalk.2:
+    description: Override max walk speed to 2.
+    default: false
+  flyspeedlimit.maxwalk.3:
+    description: Override max walk speed to 3.
+    default: false
+  flyspeedlimit.maxwalk.4:
+    description: Override max walk speed to 4.
+    default: false
+  flyspeedlimit.maxwalk.5:
+    description: Override max walk speed to 5.
+    default: false
+  flyspeedlimit.maxwalk.6:
+    description: Override max walk speed to 6.
+    default: false
+  flyspeedlimit.maxwalk.7:
+    description: Override max walk speed to 7.
+    default: false
+  flyspeedlimit.maxwalk.8:
+    description: Override max walk speed to 8.
+    default: false
+  flyspeedlimit.maxwalk.9:
+    description: Override max walk speed to 9.
+    default: false
+  flyspeedlimit.maxwalk.10:
+    description: Override max walk speed to 10 (no cap).
+    default: false

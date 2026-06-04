@@ -9,17 +9,19 @@ public class FlySpeedLimit extends JavaPlugin {
 
     private PluginConfig pluginConfig;
     private BlockPlaceRateLimiter rateLimiter;
+    private SpeedCommand speedCommand;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         pluginConfig = new PluginConfig(this);
-        rateLimiter = new BlockPlaceRateLimiter(this);
+        rateLimiter  = new BlockPlaceRateLimiter(this);
+        speedCommand = new SpeedCommand(this);
 
-        getServer().getPluginManager().registerEvents(new FlySpeedListener(this, rateLimiter), this);
+        getServer().getPluginManager().registerEvents(
+                new FlySpeedListener(this, rateLimiter, speedCommand), this);
         getServer().getPluginManager().registerEvents(rateLimiter, this);
 
-        SpeedCommand speedCommand = new SpeedCommand(this);
         if (getCommand("speed") != null) {
             getCommand("speed").setExecutor(speedCommand);
             getCommand("speed").setTabCompleter(speedCommand);
@@ -28,8 +30,8 @@ public class FlySpeedLimit extends JavaPlugin {
             getCommand("flyspeedlimit").setExecutor(this);
         }
 
-        getLogger().info("FlySpeedLimit enabled. Max fly speed: " + pluginConfig.getMaxFlySpeed()
-                + ", Max walk speed: " + pluginConfig.getMaxWalkSpeed());
+        getLogger().info("FlySpeedLimit enabled. Max fly: " + pluginConfig.getMaxFlySpeed()
+                + ", Max walk: " + pluginConfig.getMaxWalkSpeed());
     }
 
     @Override
