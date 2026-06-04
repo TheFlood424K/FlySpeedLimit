@@ -14,8 +14,6 @@
 
     <properties>
         <java.version>25</java.version>
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
         <maven.compiler.release>25</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -31,7 +29,6 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <!-- Targets Paper 26.1.2 stable. For latest build resolution use: [26.1.2.build,) -->
             <version>26.1.2.build.66-stable</version>
             <scope>provided</scope>
         </dependency>
@@ -43,9 +40,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
-                <configuration>
-                    <release>${java.version}</release>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -54,9 +48,7 @@
                 <executions>
                     <execution>
                         <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
+                        <goals><goal>shade</goal></goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                         </configuration>
@@ -64,10 +56,23 @@
                 </executions>
             </plugin>
         </plugins>
+
         <resources>
+            <!-- plugin.yml needs Maven filtering so ${project.version} is substituted -->
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+            <!-- config.yml must NOT be filtered — Maven will corrupt YAML special chars -->
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>

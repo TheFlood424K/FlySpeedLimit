@@ -2,59 +2,71 @@ name: FlySpeedLimit
 version: ${project.version}
 main: net.medievalnetwork.flyspeedlimit.FlySpeedLimit
 api-version: '26'
-description: Overrides EssentialsX speed commands and caps fly speed to a configurable maximum.
+description: Caps fly/walk speed with per-player permission overrides.
 author: TheFlood424K
 softdepend: [Essentials]
 
+# -----------------------------------------------------------------------
+# Every command is registered as its own top-level entry so Paper assigns
+# a CommandMap slot for each one. Aliases are listed under the canonical
+# command only for /help display purposes.
+#
+# IMPORTANT: No 'permission:' field is set on any command here.
+# Paper's built-in permission check fires BEFORE the executor and would
+# reject players who don't have that exact node — even if they have a
+# child node or the parent. All permission logic lives in code instead.
+# -----------------------------------------------------------------------
+
 commands:
+
   speed:
-    description: Change your walk or fly speed.
-    usage: /speed <walk|fly> <0-10> [player]
-    aliases: [flyspeed, fspeed, walkspeed, wspeed]
+    description: Set your fly or walk speed.
+    usage: /speed <fly|walk> <0-10> [player]
+
+  flyspeed:
+    description: Set your fly speed.
+    usage: /flyspeed <0-10> [player]
+    aliases: [fspeed]
+
+  walkspeed:
+    description: Set your walk speed.
+    usage: /walkspeed <0-10> [player]
+    aliases: [wspeed]
+
   flyspeedlimit:
-    description: Reload the FlySpeedLimit config.
+    description: Reload the FlySpeedLimit configuration.
     usage: /flyspeedlimit reload
     aliases: [fsl]
-    permission: flyspeedlimit.admin
 
 permissions:
 
-  # ── Admin ──────────────────────────────────────────────────────────────────
   flyspeedlimit.admin:
-    description: Allows reloading the FlySpeedLimit config.
+    description: Allows reloading the config.
     default: op
 
-  # ── Bypass ─────────────────────────────────────────────────────────────────
   flyspeedlimit.bypass:
     description: Bypass all speed caps and the block-place rate limiter.
     default: false
 
-  # ── Command permissions ────────────────────────────────────────────────────
   flyspeedlimit.speed:
-    description: >-
-      Grants access to both /speed fly and /speed walk (and their aliases).
-      Acts as a parent: having this permission implies flyspeedlimit.speed.fly
-      and flyspeedlimit.speed.walk.
+    description: Grants access to both /speed fly and /speed walk.
     default: false
     children:
       flyspeedlimit.speed.fly: true
       flyspeedlimit.speed.walk: true
 
   flyspeedlimit.speed.fly:
-    description: >-
-      Allows use of /flyspeed, /fspeed, and /speed fly.
+    description: Allows /flyspeed, /fspeed, and /speed fly.
     default: false
 
   flyspeedlimit.speed.walk:
-    description: >-
-      Allows use of /walkspeed, /wspeed, and /speed walk.
+    description: Allows /walkspeed, /wspeed, and /speed walk.
     default: false
 
   flyspeedlimit.speed.others:
     description: Allows changing another player's speed.
     default: op
 
-  # ── Per-permission max speed overrides ────────────────────────────────────
   flyspeedlimit.maxfly.1:
     description: Override max fly speed to 1.
     default: false
@@ -83,7 +95,7 @@ permissions:
     description: Override max fly speed to 9.
     default: false
   flyspeedlimit.maxfly.10:
-    description: Override max fly speed to 10 (no cap).
+    description: Override max fly speed to 10.
     default: false
 
   flyspeedlimit.maxwalk.1:
@@ -114,5 +126,5 @@ permissions:
     description: Override max walk speed to 9.
     default: false
   flyspeedlimit.maxwalk.10:
-    description: Override max walk speed to 10 (no cap).
+    description: Override max walk speed to 10.
     default: false
