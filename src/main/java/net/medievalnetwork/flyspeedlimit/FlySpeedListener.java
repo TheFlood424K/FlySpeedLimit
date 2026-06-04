@@ -1,51 +1,58 @@
 package net.medievalnetwork.flyspeedlimit;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.entity.Player;
 
-public class FlySpeedListener implements Listener {
+public final class FlySpeedListener implements Listener {
 
     private final FlySpeedLimit plugin;
-    private final BlockPlaceRateLimiter rateLimiter;
-    private final SpeedCommand speedCommand;
 
-    public FlySpeedListener(FlySpeedLimit plugin, BlockPlaceRateLimiter rateLimiter,
-                             SpeedCommand speedCommand) {
+    public FlySpeedListener(FlySpeedLimit plugin) {
         this.plugin = plugin;
-        this.rateLimiter = rateLimiter;
-        this.speedCommand = speedCommand;
     }
 
+    /** Clamp fly speed on join if enforce-on-join is enabled. */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
         if (!plugin.cfg().isEnforceOnJoin()) return;
-        clampFly(event.getPlayer(), false);
+        Player player = event.getPlayer();
+        enforceFlySpeed(player);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    /** Real-time enforcement: catches EssentialsX or other plugins setting speed above the cap. */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.isFlying()) return;
-        clampFly(player, true);
+        enforceFlySpeed(player);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onQuit(PlayerQuitEvent event) {
-        rateLimiter.remove(event.getPlayer().getUniqueId());
-    }
+    private void enforceFlySpeed(Player player) {
+        if (player.hasPermission("flyspeedlimit.bypass")) return;
 
-    private void clampFly(Player player, boolean notify) {
-        // Use the same cap resolution as SpeedCommand so permission overrides are respected
-        float max = plugin.cfg().toNative(speedCommand.effectiveCap(player, "fly"));
-        if (player.getFlySpeed() > max) {
-            player.setFlySpeed(max);
-            if (notify) player.sendMessage(
-                    plugin.cfg().speedClampedMsg(speedCommand.effectiveCap(player, "fly")));
+        float cap = resolveFlyCap(player);
+        float nativeCap = plugin.cfg().toNative(cap);
+        float current = player.getFlySpeed();
+
+        if (current > nativeCap + 0.001f) {
+            player.setFlySpeed(nativeCap);
+            player.sendMessage(plugin.cfg().msg("speed-clamped")
+                    .replace("{max}", fmt(cap)));
         }
+    }
+
+    private float resolveFlyCap(Player player) {
+        for (int i = 10; i >= 1; i--) {
+            if (player.hasPermission("flyspeedlimit.maxfly." + i)) return i;
+        }
+        return plugin.cfg().getMaxFlySpeed();
+    }
+
+    private String fmt(float v) {
+        return (v == (int) v) ? String.valueOf((int) v) : String.valueOf(v);
     }
 }

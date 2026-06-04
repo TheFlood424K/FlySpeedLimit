@@ -1,35 +1,13 @@
-# FlySpeedLimit Configuration
-# --------------------------------
-# Uses the same 0-10 scale as EssentialsX's /speed command.
-# Internally Minecraft stores speed as 0.0-1.0; this plugin converts using
-# the same formula EssentialsX uses: nativeSpeed = value / 10
-
-# Default maximum fly speed (EssentialsX 0-10 scale).
-# This is the fallback used when a player has no flyspeedlimit.maxfly.<n> permission.
-# Players with flyspeedlimit.maxfly.<n> use the highest n they have instead.
-# Players with flyspeedlimit.bypass ignore this entirely.
 max-fly-speed: 2
-
-# Default maximum walk speed (EssentialsX 0-10 scale).
-# Overridable per-player via flyspeedlimit.maxwalk.<n>.
-# Set to 10 for no practical default limit.
 max-walk-speed: 10
-
-# If true, a player's fly speed is clamped to their effective max on login.
 enforce-on-join: true
-
-# Block-placement rate limiter.
-# Prevents players from gaining a fastplace advantage from high fly speed.
-# Scales the block placement cooldown proportionally to fly speed so that
-# faster fliers place at the same blocks-per-second rate as baseline.
 block-place-rate-limit: true
-
 messages:
-  speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
+  speed-clamped: "&cYour fly speed has been capped to &e{max}&c."
   reload-success: "&aFlySpeedLimit config reloaded."
-  no-permission: "&cYou do not have permission to do that."
+  no-permission: "&cYou don't have permission to do that."
   invalid-number: "&cSpeed must be a number between 0 and 10."
-  usage-speed: "&eUsage: /speed <walk|fly> <0-10> [player]"
+  usage-speed: "&eUsage: /speed <fly|walk> <0-10> [player]"
   usage-flyspeed: "&eUsage: /flyspeed <0-10> [player]"
   usage-walkspeed: "&eUsage: /walkspeed <0-10> [player]"
   player-not-found: "&cPlayer not found."

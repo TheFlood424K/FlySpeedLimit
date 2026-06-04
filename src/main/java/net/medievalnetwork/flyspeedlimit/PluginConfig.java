@@ -1,6 +1,6 @@
 package net.medievalnetwork.flyspeedlimit;
 
-public class PluginConfig {
+public final class PluginConfig {
 
     private final FlySpeedLimit plugin;
     private float maxFlySpeed;
@@ -14,39 +14,34 @@ public class PluginConfig {
     }
 
     public void reload() {
+        plugin.reloadConfig();
         load();
     }
 
     private void load() {
-        maxFlySpeed = clamp((float) plugin.getConfig().getDouble("max-fly-speed", 2.0));
-        maxWalkSpeed = clamp((float) plugin.getConfig().getDouble("max-walk-speed", 10.0));
-        enforceOnJoin = plugin.getConfig().getBoolean("enforce-on-join", true);
+        maxFlySpeed       = clamp((float) plugin.getConfig().getDouble("max-fly-speed", 2.0));
+        maxWalkSpeed      = clamp((float) plugin.getConfig().getDouble("max-walk-speed", 10.0));
+        enforceOnJoin     = plugin.getConfig().getBoolean("enforce-on-join", true);
         blockPlaceRateLimit = plugin.getConfig().getBoolean("block-place-rate-limit", true);
     }
 
-    private float clamp(float value) {
-        return Math.max(0.0f, Math.min(10.0f, value));
+    private float clamp(float v) {
+        return Math.max(0f, Math.min(10f, v));
     }
 
-    /**
-     * Converts an EssentialsX-scale value (0-10) to Minecraft's native fly/walk speed (0.0-1.0).
-     */
-    public float toNative(float essentialsScale) {
-        return clamp(essentialsScale) / 10.0f;
+    /** EssentialsX 0-10 scale -> Minecraft native 0.0-1.0 */
+    public float toNative(float ess) {
+        return clamp(ess) / 10f;
     }
 
-    public float getMaxFlySpeed()         { return maxFlySpeed; }
+    public float getMaxFlySpeed()          { return maxFlySpeed; }
     public float getMaxWalkSpeed()         { return maxWalkSpeed; }
     public boolean isEnforceOnJoin()       { return enforceOnJoin; }
     public boolean isBlockPlaceRateLimit() { return blockPlaceRateLimit; }
 
     public String msg(String key) {
-        return plugin.getConfig()
-                .getString("messages." + key, "&eFlySpeedLimit: unknown message '" + key + "'")
-                .replace('&', '\u00a7');
-    }
-
-    public String speedClampedMsg(float max) {
-        return msg("speed-clamped").replace("{max}", String.valueOf((int) max));
+        String raw = plugin.getConfig().getString("messages." + key,
+                "&eFlySpeedLimit: missing message key '" + key + "'");
+        return raw.replace('&', '\u00a7');
     }
 }

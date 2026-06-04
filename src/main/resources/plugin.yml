@@ -6,125 +6,88 @@ description: Caps fly/walk speed with per-player permission overrides.
 author: TheFlood424K
 softdepend: [Essentials]
 
-# -----------------------------------------------------------------------
-# Every command is registered as its own top-level entry so Paper assigns
-# a CommandMap slot for each one. Aliases are listed under the canonical
-# command only for /help display purposes.
-#
-# IMPORTANT: No 'permission:' field is set on any command here.
-# Paper's built-in permission check fires BEFORE the executor and would
-# reject players who don't have that exact node — even if they have a
-# child node or the parent. All permission logic lives in code instead.
-# -----------------------------------------------------------------------
-
 commands:
-
   speed:
     description: Set your fly or walk speed.
     usage: /speed <fly|walk> <0-10> [player]
-
   flyspeed:
     description: Set your fly speed.
     usage: /flyspeed <0-10> [player]
-    aliases: [fspeed]
-
+  fspeed:
+    description: Set your fly speed.
+    usage: /fspeed <0-10> [player]
   walkspeed:
     description: Set your walk speed.
     usage: /walkspeed <0-10> [player]
-    aliases: [wspeed]
-
+  wspeed:
+    description: Set your walk speed.
+    usage: /wspeed <0-10> [player]
   flyspeedlimit:
-    description: Reload the FlySpeedLimit configuration.
+    description: Reload FlySpeedLimit config.
     usage: /flyspeedlimit reload
-    aliases: [fsl]
+  fsl:
+    description: Alias for /flyspeedlimit.
+    usage: /fsl reload
 
 permissions:
-
   flyspeedlimit.admin:
-    description: Allows reloading the config.
+    description: Reload the config.
     default: op
-
   flyspeedlimit.bypass:
-    description: Bypass all speed caps and the block-place rate limiter.
+    description: Bypass all speed caps.
     default: false
-
   flyspeedlimit.speed:
-    description: Grants access to both /speed fly and /speed walk.
+    description: Use both /speed fly and /speed walk.
     default: false
     children:
       flyspeedlimit.speed.fly: true
       flyspeedlimit.speed.walk: true
-
   flyspeedlimit.speed.fly:
-    description: Allows /flyspeed, /fspeed, and /speed fly.
+    description: Use /flyspeed and /speed fly.
     default: false
-
   flyspeedlimit.speed.walk:
-    description: Allows /walkspeed, /wspeed, and /speed walk.
+    description: Use /walkspeed and /speed walk.
     default: false
-
   flyspeedlimit.speed.others:
-    description: Allows changing another player's speed.
+    description: Change another player's speed.
     default: op
-
   flyspeedlimit.maxfly.1:
-    description: Override max fly speed to 1.
     default: false
   flyspeedlimit.maxfly.2:
-    description: Override max fly speed to 2.
     default: false
   flyspeedlimit.maxfly.3:
-    description: Override max fly speed to 3.
     default: false
   flyspeedlimit.maxfly.4:
-    description: Override max fly speed to 4.
     default: false
   flyspeedlimit.maxfly.5:
-    description: Override max fly speed to 5.
     default: false
   flyspeedlimit.maxfly.6:
-    description: Override max fly speed to 6.
     default: false
   flyspeedlimit.maxfly.7:
-    description: Override max fly speed to 7.
     default: false
   flyspeedlimit.maxfly.8:
-    description: Override max fly speed to 8.
     default: false
   flyspeedlimit.maxfly.9:
-    description: Override max fly speed to 9.
     default: false
   flyspeedlimit.maxfly.10:
-    description: Override max fly speed to 10.
     default: false
-
   flyspeedlimit.maxwalk.1:
-    description: Override max walk speed to 1.
     default: false
   flyspeedlimit.maxwalk.2:
-    description: Override max walk speed to 2.
     default: false
   flyspeedlimit.maxwalk.3:
-    description: Override max walk speed to 3.
     default: false
   flyspeedlimit.maxwalk.4:
-    description: Override max walk speed to 4.
     default: false
   flyspeedlimit.maxwalk.5:
-    description: Override max walk speed to 5.
     default: false
   flyspeedlimit.maxwalk.6:
-    description: Override max walk speed to 6.
     default: false
   flyspeedlimit.maxwalk.7:
-    description: Override max walk speed to 7.
     default: false
   flyspeedlimit.maxwalk.8:
-    description: Override max walk speed to 8.
     default: false
   flyspeedlimit.maxwalk.9:
-    description: Override max walk speed to 9.
     default: false
   flyspeedlimit.maxwalk.10:
-    description: Override max walk speed to 10.
     default: false

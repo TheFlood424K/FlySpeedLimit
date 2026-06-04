@@ -11,83 +11,46 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Prevents players from gaining a block-placement speed advantage through high fly speed.
- *
- * Root cause: Minecraft's block placement rate is not independently throttled by the server.
- * Players flying at high speed send significantly more movement packets per second, which
- * incidentally allows them to place blocks faster than a player at default fly speed.
- * This listener enforces a per-player placement cooldown that scales proportionally
- * with the player's current fly speed, so faster fliers are held to the same
- * effective blocks-per-second rate as a player flying at the baseline speed.
- *
- * The cooldown is only applied while the player is flying and has an elevated fly speed.
- * Walking players and players at or below the baseline speed are unaffected.
+ * Prevents fastplace advantage that comes from elevated fly speed.
+ * Players flying above baseline speed are given a proportional block-placement
+ * cooldown so their blocks-per-second rate stays the same as a baseline flier.
  */
-public class BlockPlaceRateLimiter implements Listener {
+public final class BlockPlaceRateLimiter implements Listener {
 
-    /**
-     * Minecraft's default creative fly speed on the EssentialsX 0-10 scale.
-     * EssentialsX maps native 0.1 → scale 2 (native = scale / 10, default native = 0.1).
-     * We treat anything at or below this as "baseline" — no cooldown needed.
-     */
-    private static final float BASELINE_SPEED = 1.0f;
-
-    /**
-     * Base interval in milliseconds between block placements at baseline fly speed.
-     * Vanilla allows approximately 4 placements per second (250 ms) when not moving.
-     * We use a slightly relaxed value to avoid false positives on laggy connections.
-     */
-    private static final long BASE_INTERVAL_MS = 250L;
-
-    /** Last placement timestamp per player UUID. */
-    private final Map<UUID, Long> lastPlace = new HashMap<>();
+    /** Baseline native fly speed (Minecraft default = 0.1 = EssentialsX speed 1). */
+    private static final float BASELINE_NATIVE = 0.1f;
+    /** Minimum ms between placements at baseline speed. */
+    private static final long  BASE_INTERVAL_MS = 250L;
 
     private final FlySpeedLimit plugin;
+    private final Map<UUID, Long> lastPlace = new HashMap<>();
 
     public BlockPlaceRateLimiter(FlySpeedLimit plugin) {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onBlockPlace(BlockPlaceEvent event) {
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onPlace(BlockPlaceEvent event) {
+        if (!plugin.cfg().isBlockPlaceRateLimit()) return;
+
         Player player = event.getPlayer();
-
-        // Only restrict while actively flying.
         if (!player.isFlying()) return;
-
-        // Bypass permission skips the rate limiter entirely.
         if (player.hasPermission("flyspeedlimit.bypass")) return;
 
-        // Convert native fly speed back to EssentialsX scale for readability.
-        float essSpeed = player.getFlySpeed() * 10.0f;
+        float native_ = player.getFlySpeed();
+        if (native_ <= BASELINE_NATIVE + 0.001f) return; // at or below baseline, no throttle needed
 
-        // No restriction for players at or below the baseline speed.
-        if (essSpeed <= BASELINE_SPEED) return;
-
-        // Scale the required cooldown proportionally to speed.
-        // A player at 2× baseline speed must wait 2× as long between placements,
-        // keeping their effective blocks-per-second identical to a baseline player.
-        long requiredInterval = (long) (BASE_INTERVAL_MS * (essSpeed / BASELINE_SPEED));
+        float ratio = native_ / BASELINE_NATIVE;
+        long required = (long) (BASE_INTERVAL_MS * ratio);
 
         long now = System.currentTimeMillis();
-        UUID uuid = player.getUniqueId();
-        long last = lastPlace.getOrDefault(uuid, 0L);
+        long last = lastPlace.getOrDefault(player.getUniqueId(), 0L);
 
-        if (now - last < requiredInterval) {
+        if (now - last < required) {
             event.setCancelled(true);
-            // Send a block update so the client reverts the optimistic placement.
-            player.sendBlockChange(
-                    event.getBlock().getLocation(),
-                    event.getBlock().getBlockData()
-            );
             return;
         }
 
-        lastPlace.put(uuid, now);
-    }
-
-    /** Clean up stored timestamps when a player quits to avoid memory leaks. */
-    public void remove(UUID uuid) {
-        lastPlace.remove(uuid);
+        lastPlace.put(player.getUniqueId(), now);
     }
 }
