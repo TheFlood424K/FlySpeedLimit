@@ -1,22 +1,28 @@
 # FlySpeedLimit Configuration
 # --------------------------------
-# max-fly-speed: The maximum fly speed players are allowed to set.
-#   This maps to the value used with /speed fly <value> (EssentialsX scale: 0.0 - 10.0).
-#   Internally Minecraft stores fly speed as 0.0 - 1.0, so this plugin
-#   converts using the same formula EssentialsX uses (value / 10).
-#   Examples:
-#     2  -> allows up to /speed fly 2  (2x normal speed)
-#     5  -> allows up to /speed fly 5  (5x normal speed)
-#     10 -> no real limit (Minecraft hard cap)
+# Uses the same 0-10 scale as EssentialsX's /speed command.
+# Internally Minecraft stores speed as 0.0-1.0; this plugin converts using
+# the same formula EssentialsX uses: nativeSpeed = value / 10
 
+# Maximum fly speed players can set with /speed fly
+# e.g. 2 allows /speed fly 1 and /speed fly 2, but blocks /speed fly 3+
 max-fly-speed: 2
 
-# enforce-on-join: If true, a player's fly speed will be clamped to the
-#   max when they log in (in case someone set it higher before the plugin
-#   was installed, or while they had the bypass permission).
+# Maximum walk speed players can set with /speed walk
+# Set to 10 for no practical limit
+max-walk-speed: 10
+
+# If true, a player's fly speed is clamped to max-fly-speed on login
 enforce-on-join: true
 
-# messages:
 messages:
   speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
   reload-success: "&aFlySpeedLimit config reloaded."
+  no-permission: "&cYou do not have permission to do that."
+  invalid-number: "&cSpeed must be a number between 0 and 10."
+  invalid-type: "&cUsage: /speed <walk|fly> <0-10> [player]"
+  player-not-found: "&cPlayer not found."
+  walk-set-self: "&aWalk speed set to &e{speed}&a."
+  fly-set-self: "&aFly speed set to &e{speed}&a."
+  walk-set-other: "&aSet &e{player}&a's walk speed to &e{speed}&a."
+  fly-set-other: "&aSet &e{player}&a's fly speed to &e{speed}&a."

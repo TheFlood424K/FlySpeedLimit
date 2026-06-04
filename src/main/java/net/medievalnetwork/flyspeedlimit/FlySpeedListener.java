@@ -5,7 +5,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerVelocityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 public class FlySpeedListener implements Listener {
@@ -17,42 +16,31 @@ public class FlySpeedListener implements Listener {
     }
 
     /**
-     * Clamp fly speed when a player joins.
+     * Clamp on join to catch speeds set before the plugin was loaded.
      */
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        PluginConfig cfg = plugin.getPluginConfig2();
-        if (!cfg.isEnforceOnJoin()) return;
-
-        Player player = event.getPlayer();
-        if (player.hasPermission("flyspeedlimit.bypass")) return;
-
-        clampIfNeeded(player);
+    public void onJoin(PlayerJoinEvent event) {
+        if (!plugin.cfg().isEnforceOnJoin()) return;
+        clampFly(event.getPlayer(), false);
     }
 
     /**
-     * Clamp fly speed whenever the player moves (catches /speed fly commands in real time).
-     * LOWEST priority so we run after EssentialsX sets the speed.
+     * Clamp while flying — runs at MONITOR priority so it fires after EssentialsX
+     * has already applied the speed, then corrects it if it's too high.
      */
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerMove(PlayerMoveEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.isFlying()) return;
-        if (player.hasPermission("flyspeedlimit.bypass")) return;
-
-        clampIfNeeded(player);
+        clampFly(player, true);
     }
 
-    // -------------------------------------------------------------------------
-
-    private void clampIfNeeded(Player player) {
-        PluginConfig cfg = plugin.getPluginConfig2();
-        float current = player.getFlySpeed();
-        float max = cfg.getMaxFlySpeedNative();
-
-        if (current > max) {
+    private void clampFly(Player player, boolean notify) {
+        if (player.hasPermission("flyspeedlimit.bypass")) return;
+        float max = plugin.cfg().toNative(plugin.cfg().getMaxFlySpeed());
+        if (player.getFlySpeed() > max) {
             player.setFlySpeed(max);
-            player.sendMessage(cfg.getSpeedClampedMessage(cfg.getMaxFlySpeed()));
+            if (notify) player.sendMessage(plugin.cfg().speedClampedMsg(plugin.cfg().getMaxFlySpeed()));
         }
     }
 }

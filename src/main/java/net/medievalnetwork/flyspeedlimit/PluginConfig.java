@@ -3,10 +3,8 @@ package net.medievalnetwork.flyspeedlimit;
 public class PluginConfig {
 
     private final FlySpeedLimit plugin;
-
-    // EssentialsX uses (value / 10) to convert its 0-10 scale to Minecraft's 0-1 float.
-    // We store the Essentials-scale max (e.g. 2) and convert when applying.
     private float maxFlySpeed;
+    private float maxWalkSpeed;
     private boolean enforceOnJoin;
 
     public PluginConfig(FlySpeedLimit plugin) {
@@ -14,49 +12,39 @@ public class PluginConfig {
         load();
     }
 
-    private void load() {
-        maxFlySpeed = (float) plugin.getConfig().getDouble("max-fly-speed", 2.0);
-        enforceOnJoin = plugin.getConfig().getBoolean("enforce-on-join", true);
-
-        // Clamp to Minecraft/EssentialsX valid range (0.0 - 10.0)
-        if (maxFlySpeed < 0.0f) maxFlySpeed = 0.0f;
-        if (maxFlySpeed > 10.0f) maxFlySpeed = 10.0f;
-    }
-
     public void reload() {
         load();
     }
 
-    /**
-     * Returns the max fly speed in EssentialsX scale (0–10).
-     */
-    public float getMaxFlySpeed() {
-        return maxFlySpeed;
+    private void load() {
+        maxFlySpeed = clamp((float) plugin.getConfig().getDouble("max-fly-speed", 2.0));
+        maxWalkSpeed = clamp((float) plugin.getConfig().getDouble("max-walk-speed", 10.0));
+        enforceOnJoin = plugin.getConfig().getBoolean("enforce-on-join", true);
+    }
+
+    private float clamp(float value) {
+        return Math.max(0.0f, Math.min(10.0f, value));
     }
 
     /**
-     * Returns the max fly speed in Minecraft's native float scale (0.0–1.0).
-     * Minecraft default = 0.1f, which EssentialsX calls "1".
-     * EssentialsX formula: mcSpeed = essSpeed / 10
+     * Converts an EssentialsX-scale value (0-10) to Minecraft's native fly/walk speed (0.0-1.0).
+     * EssentialsX formula: nativeSpeed = essSpeed / 10
      */
-    public float getMaxFlySpeedNative() {
-        return maxFlySpeed / 10.0f;
+    public float toNative(float essentialsScale) {
+        return clamp(essentialsScale) / 10.0f;
     }
 
-    public boolean isEnforceOnJoin() {
-        return enforceOnJoin;
+    public float getMaxFlySpeed() { return maxFlySpeed; }
+    public float getMaxWalkSpeed() { return maxWalkSpeed; }
+    public boolean isEnforceOnJoin() { return enforceOnJoin; }
+
+    public String msg(String key) {
+        return plugin.getConfig()
+                .getString("messages." + key, "&eFlySpeedLimit: unknown message '" + key + "'")
+                .replace('&', '\u00a7');
     }
 
-    public String getMessage(String key) {
-        String raw = plugin.getConfig().getString("messages." + key, "&eFlySpeedLimit: unknown message '" + key + "'");
-        return colorize(raw);
-    }
-
-    public String getSpeedClampedMessage(float max) {
-        return getMessage("speed-clamped").replace("{max}", String.valueOf((int) max));
-    }
-
-    private String colorize(String input) {
-        return input.replace('&', '\u00a7');
+    public String speedClampedMsg(float max) {
+        return msg("speed-clamped").replace("{max}", String.valueOf((int) max));
     }
 }

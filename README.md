@@ -1,15 +1,17 @@
 # FlySpeedLimit
 
-A lightweight **Spigot / Paper** plugin that caps fly speed to a configurable maximum value — filling the gap left by EssentialsX's broken `max-fly-speed` setting.
+A lightweight **Spigot / Paper** plugin that provides an EssentialsX-style `/speed` command while enforcing configurable fly and walk speed caps — fixing EssentialsX's broken `max-fly-speed` setting.
 
 ## Features
 
-- Configurable maximum fly speed (uses the same **0–10 scale** as `/speed fly` in EssentialsX)
-- Enforces the cap in real-time as players fly (catches `/speed fly` commands immediately)
-- Optionally clamps a player's fly speed when they join
-- Bypass permission for admins / trusted players
-- In-game `/flyspeedlimit reload` command
-- Friendly, configurable messages
+- EssentialsX-compatible `/speed <walk|fly> <0-10> [player]` command
+- Aliases: `/flyspeed`, `/fspeed`, `/walkspeed`, `/wspeed`
+- Configurable max fly speed and max walk speed (0–10 EssentialsX scale)
+- Real-time enforcement via PlayerMoveEvent (catches EssentialsX `/speed` too if not disabled)
+- Optional clamp on player join
+- Bypass permission for admins
+- Tab completion for type, value, and player name
+- In-game `/flyspeedlimit reload` (`/fsl reload`)
 
 ## Requirements
 
@@ -17,45 +19,59 @@ A lightweight **Spigot / Paper** plugin that caps fly speed to a configurable ma
 |----------|---------|
 | Java | 17+ |
 | Spigot / Paper | 1.21+ |
-| EssentialsX | Optional (not required) |
+| EssentialsX | Optional |
 
 ## Installation
 
-1. Download the latest JAR from [Releases](../../releases).
-2. Drop it into your `plugins/` folder.
-3. Restart the server.
-4. Edit `plugins/FlySpeedLimit/config.yml` to your liking.
-5. Run `/fsl reload` to apply changes without a restart.
+1. Drop the JAR into your `plugins/` folder.
+2. Restart the server.
+3. Edit `plugins/FlySpeedLimit/config.yml`.
+4. Run `/fsl reload` to apply changes without a restart.
 
-## Building from Source
+## Overriding EssentialsX
 
-```bash
-git clone https://github.com/TheFlood424K/FlySpeedLimit.git
-cd FlySpeedLimit
-mvn package
-# Output: target/FlySpeedLimit-1.0.0.jar
+To make this plugin own `/speed` and all its aliases instead of EssentialsX, disable EssentialsX's `speed` command in `plugins/Essentials/config.yml`:
+
+```yaml
+disabled-commands:
+  - speed
 ```
+
+EssentialsX treats `speed` as the root command — disabling it also disables `/flyspeed`, `/fspeed`, `/walkspeed`, and `/wspeed` from EssentialsX. This plugin will then handle all of them.
+
+If you do **not** disable it in EssentialsX, the PlayerMoveEvent listener still acts as a safety net and will clamp any speed above the configured max in real-time.
 
 ## Configuration
 
 ```yaml
 # plugins/FlySpeedLimit/config.yml
 
-# Maximum fly speed on the EssentialsX 0–10 scale.
-# Default (2) allows /speed fly 1 and /speed fly 2, but blocks 3+.
+# Max fly speed (EssentialsX 0-10 scale)
+# 2 = allows /speed fly 1 and /speed fly 2, blocks /speed fly 3+
 max-fly-speed: 2
 
-# If true, a player's fly speed is clamped when they log in.
+# Max walk speed (set to 10 for no practical limit)
+max-walk-speed: 10
+
+# Clamp fly speed when a player logs in
 enforce-on-join: true
 
 messages:
   speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
   reload-success: "&aFlySpeedLimit config reloaded."
+  no-permission: "&cYou do not have permission to do that."
+  invalid-number: "&cSpeed must be a number between 0 and 10."
+  invalid-type: "&cUsage: /speed <walk|fly> <0-10> [player]"
+  player-not-found: "&cPlayer not found."
+  walk-set-self: "&aWalk speed set to &e{speed}&a."
+  fly-set-self: "&aFly speed set to &e{speed}&a."
+  walk-set-other: "&aSet &e{player}&a's walk speed to &e{speed}&a."
+  fly-set-other: "&aSet &e{player}&a's fly speed to &e{speed}&a."
 ```
 
 ### Speed Scale Reference
 
-| `max-fly-speed` | Meaning |
+| `max-fly-speed` | Effect |
 |---|---|
 | `1` | Default Minecraft fly speed only |
 | `2` | Up to 2× normal (recommended) |
@@ -64,23 +80,30 @@ messages:
 
 ## Commands
 
-| Command | Permission | Description |
-|---------|-----------|-------------|
-| `/flyspeedlimit reload` | `flyspeedlimit.admin` | Reloads the config file |
-| `/fsl reload` | `flyspeedlimit.admin` | Alias for the above |
+| Command | Description |
+|---------|-------------|
+| `/speed <walk\|fly> <0-10> [player]` | Set walk or fly speed |
+| `/flyspeed <0-10> [player]` | Alias — sets fly speed |
+| `/walkspeed <0-10> [player]` | Alias — sets walk speed |
+| `/fsl reload` | Reload config |
 
 ## Permissions
 
 | Permission | Default | Description |
 |------------|---------|-------------|
-| `flyspeedlimit.admin` | `op` | Allows `/fsl reload` |
-| `flyspeedlimit.bypass` | `false` | Bypasses the fly speed limit |
+| `flyspeedlimit.speed` | `true` | Use `/speed` |
+| `flyspeedlimit.speed.others` | `op` | Change another player's speed |
+| `flyspeedlimit.admin` | `op` | Run `/fsl reload` |
+| `flyspeedlimit.bypass` | `false` | Bypass speed caps |
 
-## How It Works
+## Building
 
-EssentialsX's `max-fly-speed` config only accepts 0.1–1.0 and [doesn't reliably enforce limits](https://github.com/EssentialsX/Essentials/issues/942). This plugin listens for player move events while flying (at `LOWEST` priority, after EssentialsX sets the speed) and immediately resets the speed to the configured maximum if it's been exceeded.
-
-Minecraft stores fly speed as a float from `0.0` to `1.0`. EssentialsX's `/speed fly` command accepts `0`–`10` and divides by 10 internally. FlySpeedLimit uses the same conversion, so `max-fly-speed: 2` in the config corresponds directly to `/speed fly 2`.
+```bash
+git clone https://github.com/TheFlood424K/FlySpeedLimit.git
+cd FlySpeedLimit
+mvn package
+# Output: target/FlySpeedLimit-1.1.0.jar
+```
 
 ## License
 

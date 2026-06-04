@@ -2,10 +2,15 @@ name: FlySpeedLimit
 version: ${project.version}
 main: net.medievalnetwork.flyspeedlimit.FlySpeedLimit
 api-version: '1.21'
-description: Caps fly speed to a configurable maximum, works alongside EssentialsX.
+description: Overrides EssentialsX speed commands and caps fly speed to a configurable maximum.
 author: TheFlood424K
+softdepend: [Essentials]
 
 commands:
+  speed:
+    description: Change your walk or fly speed.
+    usage: /speed <walk|fly> <0-10> [player]
+    aliases: [flyspeed, fspeed, walkspeed, wspeed]
   flyspeedlimit:
     description: Reload the FlySpeedLimit config.
     usage: /flyspeedlimit reload
@@ -17,5 +22,11 @@ permissions:
     description: Allows reloading the FlySpeedLimit config.
     default: op
   flyspeedlimit.bypass:
-    description: Allows bypassing the fly speed limit.
+    description: Bypasses the fly and walk speed limits.
     default: false
+  flyspeedlimit.speed:
+    description: Allows use of /speed.
+    default: true
+  flyspeedlimit.speed.others:
+    description: Allows changing another player's speed.
+    default: op

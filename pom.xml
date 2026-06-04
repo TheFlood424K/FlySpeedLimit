@@ -6,11 +6,11 @@
 
     <groupId>net.medievalnetwork</groupId>
     <artifactId>FlySpeedLimit</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>FlySpeedLimit</name>
-    <description>Caps fly speed to a configurable maximum value.</description>
+    <description>Overrides EssentialsX speed commands and caps fly speed to a configurable maximum.</description>
 
     <properties>
         <java.version>17</java.version>

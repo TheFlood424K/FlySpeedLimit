@@ -8,15 +8,25 @@ import org.jetbrains.annotations.NotNull;
 public class FlySpeedLimit extends JavaPlugin {
 
     private PluginConfig pluginConfig;
-    private FlySpeedListener listener;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         pluginConfig = new PluginConfig(this);
-        listener = new FlySpeedListener(this);
-        getServer().getPluginManager().registerEvents(listener, this);
-        getLogger().info("FlySpeedLimit enabled. Max fly speed: " + pluginConfig.getMaxFlySpeed());
+
+        getServer().getPluginManager().registerEvents(new FlySpeedListener(this), this);
+
+        SpeedCommand speedCommand = new SpeedCommand(this);
+        if (getCommand("speed") != null) {
+            getCommand("speed").setExecutor(speedCommand);
+            getCommand("speed").setTabCompleter(speedCommand);
+        }
+        if (getCommand("flyspeedlimit") != null) {
+            getCommand("flyspeedlimit").setExecutor(this);
+        }
+
+        getLogger().info("FlySpeedLimit enabled. Max fly speed: " + pluginConfig.getMaxFlySpeed()
+                + ", Max walk speed: " + pluginConfig.getMaxWalkSpeed());
     }
 
     @Override
@@ -28,21 +38,21 @@ public class FlySpeedLimit extends JavaPlugin {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
                              @NotNull String label, @NotNull String[] args) {
         if (!command.getName().equalsIgnoreCase("flyspeedlimit")) return false;
+        if (!sender.hasPermission("flyspeedlimit.admin")) {
+            sender.sendMessage(pluginConfig.msg("no-permission"));
+            return true;
+        }
         if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
-            if (!sender.hasPermission("flyspeedlimit.admin")) {
-                sender.sendMessage("\u00a7cYou do not have permission to do that.");
-                return true;
-            }
             reloadConfig();
             pluginConfig.reload();
-            sender.sendMessage(pluginConfig.getMessage("reload-success"));
+            sender.sendMessage(pluginConfig.msg("reload-success"));
             return true;
         }
         sender.sendMessage("\u00a7eUsage: /flyspeedlimit reload");
         return true;
     }
 
-    public PluginConfig getPluginConfig2() {
+    public PluginConfig cfg() {
         return pluginConfig;
     }
 }
