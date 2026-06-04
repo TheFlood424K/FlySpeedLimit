@@ -8,13 +8,16 @@ import org.jetbrains.annotations.NotNull;
 public class FlySpeedLimit extends JavaPlugin {
 
     private PluginConfig pluginConfig;
+    private BlockPlaceRateLimiter rateLimiter;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         pluginConfig = new PluginConfig(this);
+        rateLimiter = new BlockPlaceRateLimiter(this);
 
-        getServer().getPluginManager().registerEvents(new FlySpeedListener(this), this);
+        getServer().getPluginManager().registerEvents(new FlySpeedListener(this, rateLimiter), this);
+        getServer().getPluginManager().registerEvents(rateLimiter, this);
 
         SpeedCommand speedCommand = new SpeedCommand(this);
         if (getCommand("speed") != null) {

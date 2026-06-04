@@ -15,6 +15,13 @@ max-walk-speed: 10
 # If true, a player's fly speed is clamped to max-fly-speed on login
 enforce-on-join: true
 
+# Block-placement rate limiter
+# Prevents players from gaining a fastplace advantage from high fly speed.
+# When a player is actively flying, their block placement rate is scaled
+# proportionally so faster fliers cannot place blocks faster than baseline.
+# Set to false to disable this feature entirely.
+block-place-rate-limit: true
+
 messages:
   speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
   reload-success: "&aFlySpeedLimit config reloaded."

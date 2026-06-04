@@ -6,6 +6,7 @@ public class PluginConfig {
     private float maxFlySpeed;
     private float maxWalkSpeed;
     private boolean enforceOnJoin;
+    private boolean blockPlaceRateLimit;
 
     public PluginConfig(FlySpeedLimit plugin) {
         this.plugin = plugin;
@@ -20,6 +21,7 @@ public class PluginConfig {
         maxFlySpeed = clamp((float) plugin.getConfig().getDouble("max-fly-speed", 2.0));
         maxWalkSpeed = clamp((float) plugin.getConfig().getDouble("max-walk-speed", 10.0));
         enforceOnJoin = plugin.getConfig().getBoolean("enforce-on-join", true);
+        blockPlaceRateLimit = plugin.getConfig().getBoolean("block-place-rate-limit", true);
     }
 
     private float clamp(float value) {
@@ -28,15 +30,15 @@ public class PluginConfig {
 
     /**
      * Converts an EssentialsX-scale value (0-10) to Minecraft's native fly/walk speed (0.0-1.0).
-     * EssentialsX formula: nativeSpeed = essSpeed / 10
      */
     public float toNative(float essentialsScale) {
         return clamp(essentialsScale) / 10.0f;
     }
 
-    public float getMaxFlySpeed() { return maxFlySpeed; }
-    public float getMaxWalkSpeed() { return maxWalkSpeed; }
-    public boolean isEnforceOnJoin() { return enforceOnJoin; }
+    public float getMaxFlySpeed()         { return maxFlySpeed; }
+    public float getMaxWalkSpeed()         { return maxWalkSpeed; }
+    public boolean isEnforceOnJoin()       { return enforceOnJoin; }
+    public boolean isBlockPlaceRateLimit() { return blockPlaceRateLimit; }
 
     public String msg(String key) {
         return plugin.getConfig()

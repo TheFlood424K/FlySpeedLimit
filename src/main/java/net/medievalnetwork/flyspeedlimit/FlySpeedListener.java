@@ -6,33 +6,34 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class FlySpeedListener implements Listener {
 
     private final FlySpeedLimit plugin;
+    private final BlockPlaceRateLimiter rateLimiter;
 
-    public FlySpeedListener(FlySpeedLimit plugin) {
+    public FlySpeedListener(FlySpeedLimit plugin, BlockPlaceRateLimiter rateLimiter) {
         this.plugin = plugin;
+        this.rateLimiter = rateLimiter;
     }
 
-    /**
-     * Clamp on join to catch speeds set before the plugin was loaded.
-     */
     @EventHandler(priority = EventPriority.MONITOR)
     public void onJoin(PlayerJoinEvent event) {
         if (!plugin.cfg().isEnforceOnJoin()) return;
         clampFly(event.getPlayer(), false);
     }
 
-    /**
-     * Clamp while flying — runs at MONITOR priority so it fires after EssentialsX
-     * has already applied the speed, then corrects it if it's too high.
-     */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         if (!player.isFlying()) return;
         clampFly(player, true);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onQuit(PlayerQuitEvent event) {
+        rateLimiter.remove(event.getPlayer().getUniqueId());
     }
 
     private void clampFly(Player player, boolean notify) {

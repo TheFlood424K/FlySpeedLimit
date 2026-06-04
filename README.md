@@ -8,6 +8,7 @@ A lightweight **Spigot / Paper** plugin that provides an EssentialsX-style `/spe
 - Aliases: `/flyspeed`, `/fspeed`, `/walkspeed`, `/wspeed`
 - Configurable max fly speed and max walk speed (0–10 EssentialsX scale)
 - Real-time enforcement via PlayerMoveEvent (catches EssentialsX `/speed` too if not disabled)
+- **Block-placement rate limiter** — prevents fastplace advantage from high fly speed
 - Optional clamp on player join
 - Bypass permission for admins
 - Tab completion for type, value, and player name
@@ -47,7 +48,6 @@ If you do **not** disable it in EssentialsX, the PlayerMoveEvent listener still 
 # plugins/FlySpeedLimit/config.yml
 
 # Max fly speed (EssentialsX 0-10 scale)
-# 2 = allows /speed fly 1 and /speed fly 2, blocks /speed fly 3+
 max-fly-speed: 2
 
 # Max walk speed (set to 10 for no practical limit)
@@ -55,6 +55,10 @@ max-walk-speed: 10
 
 # Clamp fly speed when a player logs in
 enforce-on-join: true
+
+# Prevent fastplace advantage from high fly speed
+# Scales block placement cooldown proportionally to fly speed
+block-place-rate-limit: true
 
 messages:
   speed-clamped: "&cYour fly speed has been capped to the server maximum of &e{max}&c."
@@ -78,6 +82,18 @@ messages:
 | `5` | Up to 5× normal |
 | `10` | No limit (Minecraft hard cap) |
 
+## How the Fastplace Fix Works
+
+Higher fly speeds cause the client to send more movement packets per second. Because Minecraft's block placement is driven by client interaction packets — not an independent server-side timer — faster fliers can effectively place blocks more rapidly than players at default speed.
+
+The `BlockPlaceRateLimiter` enforces a proportional cooldown:
+
+```
+required_interval = BASE_INTERVAL_MS × (player_fly_speed / baseline_speed)
+```
+
+This means a player flying at 2× speed must wait 2× as long between placements, keeping their effective blocks-per-second rate identical to a player at baseline fly speed. Placement is only throttled while the player is **actively flying**. Walking players are unaffected. Players with `flyspeedlimit.bypass` skip the limiter.
+
 ## Commands
 
 | Command | Description |
@@ -94,7 +110,7 @@ messages:
 | `flyspeedlimit.speed` | `true` | Use `/speed` |
 | `flyspeedlimit.speed.others` | `op` | Change another player's speed |
 | `flyspeedlimit.admin` | `op` | Run `/fsl reload` |
-| `flyspeedlimit.bypass` | `false` | Bypass speed caps |
+| `flyspeedlimit.bypass` | `false` | Bypass speed caps and rate limiter |
 
 ## Building
 
@@ -102,7 +118,7 @@ messages:
 git clone https://github.com/TheFlood424K/FlySpeedLimit.git
 cd FlySpeedLimit
 mvn package
-# Output: target/FlySpeedLimit-1.1.0.jar
+# Output: target/FlySpeedLimit-1.2.0.jar
 ```
 
 ## License
